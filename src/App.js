@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Input, Button, Segment } from 'semantic-ui-react'
-import { SEARCH } from "./shared/constants";
+import { Input, Button, Segment, Container, Loader} from 'semantic-ui-react'
+import { SEARCH, SEARCH_USER, NO_USERS, NO_REPOS  } from "./shared/constants";
 import { getUser, getRepos } from "./shared/GitHubService";
 import User from './components/User'
 import Repository from './components/Repository'
@@ -12,7 +12,8 @@ class App extends Component {
     user: '',
     users: [],
     repos: [],
-    isLoading: false
+    isLoading: false,
+    noResultsMessage: ''
   }
   
   handleSearchChange = (event) => {
@@ -21,25 +22,37 @@ class App extends Component {
 
   handleSearchClick = async() => {
     const { user } = this.state;
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, repos: [], noResultsMessage: '' });
 
+    let users = [];
     if (user) {
       const response = await getUser(user);
-      const users = response.items;
-      this.setState({ users, isLoading: false });
+      users = response.items;
+  
+      if (Array.isArray(users)) {
+        this.setState({ users });
+      }
     }
+    const noResultsMessage = users.length ? '' : NO_USERS;
+    this.setState({ isLoading: false, noResultsMessage });
   }
 
   handleUserClick = async(repoUrl) => {
+    this.setState({ users: [], isLoading: true, noResultsMessage: '' });
     const repos = await getRepos(repoUrl);
-    this.setState({ repos });
+
+    if (Array.isArray(repos)) {
+      this.setState({ repos });
+    }
+    const noResultsMessage = repos.length ? '' : NO_REPOS;
+    this.setState({ isLoading: false, noResultsMessage });
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, noResultsMessage } = this.state;
 
     const users = this.state.users.map(user => (
-      <Segment onClick={() => this.handleUserClick(user.repos_url)} key={user.id} >
+      <Segment color='blue' onClick={() => this.handleUserClick(user.repos_url)} key={user.id} >
         <User user={user} />
       </Segment>
     ));
@@ -49,12 +62,14 @@ class App extends Component {
     ));
 
     return (
-      <div className="App">
-        <Input loading={isLoading} icon='user' placeholder={SEARCH} onChange={this.handleSearchChange} />
+      <Container textAlign="center" className={"container"}>
+        <Input loading={isLoading} icon='user' placeholder={SEARCH_USER} onChange={this.handleSearchChange} className="searchInput" />
         <Button primary onClick={this.handleSearchClick}>{SEARCH}</Button>
+        <Loader active={isLoading} size="massive" />
+        <p>{noResultsMessage}</p>
         { users }
         { repos }
-      </div>
+      </Container>
     );
   }
 }

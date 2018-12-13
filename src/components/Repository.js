@@ -17,6 +17,7 @@ export default class Repository extends PureComponent {
   render() {
     const { repo } = this.props;
     const { pulls } = this.state;
+
     return (
       <Segment color="green">
         <h2>{repo.name}</h2>

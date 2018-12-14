@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Segment, Image } from 'semantic-ui-react'
+import { Segment, Header } from 'semantic-ui-react'
 import { getPullRequests } from "../shared/GitHubService"
 import { OPEN_PRS } from '../shared/constants'
 
@@ -20,8 +20,10 @@ export default class Repository extends PureComponent {
 
     return (
       <Segment color="green">
-        <h2>{repo.name}</h2>
-        <div>{OPEN_PRS} : {pulls.length}</div>
+        <Header as='h3' style={{ fontSize: '2em' }}>
+          {repo.name}
+        </Header>
+        <div className="textWrap">{OPEN_PRS}: {pulls.length}</div>
       </Segment>
     )
   }

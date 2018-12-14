@@ -1,10 +1,12 @@
 import React from 'react'
-import { Image } from 'semantic-ui-react'
+import { Image, Header } from 'semantic-ui-react'
 
 const User = ({ user }) => {
   return (
       <div>
-        <h2>{user.login}</h2>
+        <Header as='h3' style={{ fontSize: '2em' }}>
+            {user.login}
+        </Header>
         <Image src={user.avatar_url} avatar />
       </div>
   )

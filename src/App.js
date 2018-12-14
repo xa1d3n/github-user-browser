@@ -27,25 +27,26 @@ class App extends Component {
     let users = [];
     if (user) {
       const response = await getUser(user);
-      users = response.items;
+      const data = response.items;
   
       if (Array.isArray(users)) {
-        this.setState({ users });
+        users = data;
       }
     }
     const noResultsMessage = users.length ? '' : NO_USERS;
-    this.setState({ isLoading: false, noResultsMessage });
+    this.setState({ isLoading: false, noResultsMessage, users });
   }
 
   handleUserClick = async(repoUrl) => {
     this.setState({ users: [], isLoading: true, noResultsMessage: '' });
-    const repos = await getRepos(repoUrl);
+    const data = await getRepos(repoUrl);
 
+    let repos = []
     if (Array.isArray(repos)) {
-      this.setState({ repos });
+      repos = data;
     }
     const noResultsMessage = repos.length ? '' : NO_REPOS;
-    this.setState({ isLoading: false, noResultsMessage });
+    this.setState({ isLoading: false, noResultsMessage, repos });
   }
 
   render() {
@@ -58,15 +59,15 @@ class App extends Component {
     ));
 
     const repos = this.state.repos.map(repo => (
-      <Repository repo={repo} />
+      <Repository repo={repo} key={repo.id} />
     ));
 
     return (
-      <Container textAlign="center" className={"container"}>
+      <Container textAlign="center" className="container">
         <Input loading={isLoading} icon='user' placeholder={SEARCH_USER} onChange={this.handleSearchChange} className="searchInput" />
         <Button primary onClick={this.handleSearchClick}>{SEARCH}</Button>
         <Loader active={isLoading} size="massive" />
-        <p>{noResultsMessage}</p>
+        <p className="textWrap">{noResultsMessage}</p>
         { users }
         { repos }
       </Container>
